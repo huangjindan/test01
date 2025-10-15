@@ -28,6 +28,26 @@ namespace jsi = facebook::jsi;
 
 namespace {
 
+struct MyObject {
+  int f1;
+  char *p;
+  int f2;
+  void print() { std::cout << "f1 = " << f1 << ", f2 = " << f2 << std::endl; }
+};
+
+MyObject getObject() {
+  return MyObject{
+      .f1 = 1,
+      .p = new char,
+      .f2 = 5,
+  };
+}
+
+void MyFunc() {
+  auto obj = getObject();
+  obj.print();
+}
+
 struct SynthTraceTest : public ::testing::Test {
   std::unique_ptr<TracingHermesRuntime> rt;
   SynthTrace::TimeSinceStart dummyTime{SynthTrace::TimeSinceStart::zero()};

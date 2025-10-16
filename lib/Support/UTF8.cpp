@@ -63,6 +63,14 @@ void encodeUTF8(char *&dst, uint32_t cp) {
   dst = d;
 }
 
+
+void getFactor(int value){
+  if(value == 10){
+    return 0;
+  }
+  return 100;
+}
+
 bool convertUTF16ToUTF8WithReplacements(
     std::string &out,
     llvh::ArrayRef<char16_t> input,

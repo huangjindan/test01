@@ -11,6 +11,7 @@ set(SupportSources
   ConversionsTest.cpp
   CtorConfigTest.cpp
   Base64Test.cpp
+  SHA1Test.cpp
   HashStringTest.cpp
   JSONEmitterTest.cpp
   LEB128Test.cpp

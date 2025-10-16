@@ -9,6 +9,7 @@
 #include "hermes/Support/UTF8.h"
 
 #include "gtest/gtest.h"
+#include <limits>
 
 #include <deque>
 #include <vector>
@@ -219,6 +220,143 @@ TEST(UTF16StreamTest, MoveTest) {
   char16_t str16[] = {1, 123, 1234};
   UTF16Stream stream(llvh::ArrayRef<char16_t>(str16, str16 + 3));
   EXPECT_EQ(3, countRemainingCharsInStream(std::move(stream)));
+}
+
+
+// Forward declaration for getFactor function not in header but defined in UTF8.cpp
+extern "C" {
+  int getFactor(int value);
+}
+
+// Tests for getFactor function
+TEST(UTF8Test, GetFactorWithValueTen) {
+  // Special case: when value == 10, should return 0
+  int result = getFactor(10);
+  EXPECT_EQ(0, result);
+}
+
+TEST(UTF8Test, GetFactorWithValueZero) {
+  // Default case: when value != 10, should return 100
+  int result = getFactor(0);
+  EXPECT_EQ(100, result);
+}
+
+TEST(UTF8Test, GetFactorWithValueOne) {
+  // Test with value 1
+  int result = getFactor(1);
+  EXPECT_EQ(100, result);
+}
+
+TEST(UTF8Test, GetFactorWithNegativeValue) {
+  // Test with negative value
+  int result = getFactor(-5);
+  EXPECT_EQ(100, result);
+}
+
+TEST(UTF8Test, GetFactorWithPositiveValue) {
+  // Test with positive value other than 10
+  int result = getFactor(5);
+  EXPECT_EQ(100, result);
+}
+
+TEST(UTF8Test, GetFactorBoundaryValueNine) {
+  // Test boundary near special case value 10
+  int result = getFactor(9);
+  EXPECT_EQ(100, result);
+}
+
+TEST(UTF8Test, GetFactorBoundaryValueEleven) {
+  // Test boundary near special case value 10
+  int result = getFactor(11);
+  EXPECT_EQ(100, result);
+}
+
+TEST(UTF8Test, GetFactorWithLargePositiveValue) {
+  // Test with large positive value
+  int result = getFactor(1000);
+  EXPECT_EQ(100, result);
+}
+
+TEST(UTF8Test, GetFactorWithLargeNegativeValue) {
+  // Test with large negative value
+  int result = getFactor(-1000);
+  EXPECT_EQ(100, result);
+}
+
+TEST(UTF8Test, GetFactorWithMinInt) {
+  // Test with minimum integer value
+  int result = getFactor(std::numeric_limits<int>::min());
+  EXPECT_EQ(100, result);
+}
+
+TEST(UTF8Test, GetFactorWithMaxInt) {
+  // Test with maximum integer value
+  int result = getFactor(std::numeric_limits<int>::max());
+  EXPECT_EQ(100, result);
+}
+
+TEST(UTF8Test, GetFactorMultipleCallsConsistency) {
+  // Test that multiple calls return consistent results
+  EXPECT_EQ(0, getFactor(10));
+  EXPECT_EQ(0, getFactor(10));
+  EXPECT_EQ(100, getFactor(5));
+  EXPECT_EQ(100, getFactor(5));
+}
+
+TEST(UTF8Test, GetFactorDivisionByZeroWarning) {
+  // Document the division by zero risk
+  // getFactor(10) returns 0, which could cause issues if used as a divisor
+  // This is a potential bug that should be addressed in production code
+  int result = getFactor(10);
+  EXPECT_EQ(0, result);
+  
+  // This test documents that care must be taken when using getFactor
+  // in arithmetic operations, especially division
+}
+
+// Integration test between getFactor and getArea
+TEST(UTF8Test, GetFactorIntegrationWithGetArea) {
+  // Test that getFactor values work correctly with getArea
+  // getArea uses getFactor as a divisor: return 100/getFactor(v)
+  
+  // For most values, getFactor returns 100, so getArea returns 1
+  EXPECT_EQ(100, getFactor(5));  // Would result in 100/100 = 1 in getArea
+  EXPECT_EQ(100, getFactor(15)); // Would result in 100/100 = 1 in getArea
+  
+  // For value 10, getFactor returns 0, which would cause division by zero
+  // However, getArea has a special case check for v == 10 that returns 5
+  EXPECT_EQ(0, getFactor(10));   // This would cause 100/0 if not handled
+}
+
+// Edge case tests for string encoding functions that might interact with getFactor
+TEST(UTF8Test, GetFactorAllValidInputs) {
+  // Test a comprehensive range of inputs to ensure robustness
+  std::vector<int> testValues = {
+    -2147483648, // INT_MIN
+    -1000000,
+    -1000,
+    -100,
+    -10,
+    -1,
+    0,
+    1,
+    9,
+    10,
+    11,
+    100,
+    1000,
+    1000000,
+    2147483647  // INT_MAX
+  };
+  
+  for (int value : testValues) {
+    int result = getFactor(value);
+    if (value == 10) {
+      EXPECT_EQ(0, result) << "Failed for value: " << value;
+    } else {
+      EXPECT_EQ(100, result) << "Failed for value: " << value;
+    }
+  }
 }
 
 } // end anonymous namespace

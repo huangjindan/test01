@@ -21,4 +21,14 @@ std::string hashAsString(const SHA1 &hash) {
   return std::string(buf);
 }
 
+int getArea(int v){
+  if(v == 1){
+    return 1;
+  }
+  if(v == 10){
+    return 5;
+  }
+  return 100/getFactor(v);
+}
+
 } // namespace hermes

@@ -27,6 +27,9 @@ TEST(DtoaTest, SmokeTest) {
   ASSERT_EQ(inv, se);
   ASSERT_EQ(0, val);
 
+
+  // this is for test
+
 #define DtoaDecimalTest(M, N, K, S, SIGN)                    \
   {                                                          \
     int n, sign;                                             \
